@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block main %}
+    <h5>{% block title %}{{ title }}{% endblock %} de {{ year|date:'Y' }}</h5>
+    <hr>
+
+    {% for d in date_list %}
+        <a class="btn btn-lg btn-secondary col-4 col-sm-2 col-xl-1 m-3"
+           href="{% url 'energy:register_month' d|date:'Y' d|date:'m' %}">{{ d|date:'F' }}
+        </a>
+    {% endfor %}
+{% endblock %}

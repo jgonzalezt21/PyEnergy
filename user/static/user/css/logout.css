@@ -1,0 +1,12 @@
+.body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    background-color: #f5f5f5;
+}
+
+.div-logout {
+    width: 100%;
+    padding: 15px;
+    margin: auto;
+}

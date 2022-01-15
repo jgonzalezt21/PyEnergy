@@ -2,15 +2,14 @@
 *.log
 *.pot
 *.pyc
+*.sqlite3
+migrations/
 __pycache__/
 __init__.py
 asgi.py
 wsgi.py
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
 manage.py
-migrations/
 
 ### SECRET KEY ###
 secret_key.txt
@@ -18,3 +17,6 @@ secret_key.txt
 ### IDEs ###
 .git/
 .idea/
+
+### static ###
+vendor/

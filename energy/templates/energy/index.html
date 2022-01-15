@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main %}
+    <div class="mt-3">
+        <figure class="highcharts-figure">
+            <div id="container"></div>
+            <p class="highcharts-description">
+                Un gráfico de columnas, compara los valores de plan y real durante el mes.
+            </p>
+        </figure>
+    </div>
+
+    {% if user.is_staff %}
+        <div class="mt-5">
+            <figure>
+                <div id="container2"></div>
+                <p>Un gráfico de líneas, compara los valores de plan y real durante el año.</p>
+            </figure>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'vendor/highcharts/code/highcharts.js' %}"></script>
+
+    <script type="text/javascript">
+        const json = JSON.parse('{{ data_local|escapejs }}');
+        if (json.length !== 0) {
+            let categories = [];
+            let plan = [];
+            let real = [];
+            for (let jsonKey in json) {
+                categories.push(json[jsonKey].reading_day);
+
+                plan.push(parseInt(json[jsonKey].plan));
+                real.push(parseInt(json[jsonKey].real));
+            }
+            let series = [{'name': 'Plan', 'data': plan}, {'name': 'Real', 'data': real}];
+
+            title = 'Gráfica de consumo {{ local|join:' y ' }}';
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: title
+                },
+                subtitle: {
+                    text: "{{ month|date:'F Y' }}"
+                },
+                xAxis: {
+                    categories: categories,
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Consumo'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: false
+                    }
+                },
+                series: series
+            });
+        }
+    </script>
+
+    {% if user.is_staff %}
+        <script type="text/javascript">
+            const json2 = JSON.parse('{{ data_prov|escapejs }}');
+            if (json2.length !== 0) {
+                let categories2 = [];
+                let plan2 = [];
+                let real2 = [];
+                const meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre',
+                    'Octubre', 'Noviembre', 'Diciembre'];
+                for (let jsonKey in json2) {
+                    categories2.push(meses[json2[jsonKey].month]);
+
+                    plan2.push(parseInt(json2[jsonKey].plan2));
+                    real2.push(parseInt(json2[jsonKey].real2));
+                }
+                let series2 = [{'name': 'Plan', 'data': plan2}, {'name': 'Real', 'data': real2}];
+
+                title = 'Gráfica de consumo provinca {{ province }}';
+                Highcharts.chart('container2', {
+                    chart: {
+                        type: 'line'
+                    },
+                    title: {
+                        text: title
+                    },
+                    subtitle: {
+                        text: '{{ year }}'
+                    },
+                    xAxis: {
+                        categories: categories2,
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Consumo'
+                        }
+                    },
+                    plotOptions: {
+                        line: {
+                            dataLabels: {
+                                enabled: true
+                            },
+                            enableMouseTracking: false
+                        }
+                    },
+                    series: series2
+                });
+            }
+        </script>
+    {% endif %}
+{% endblock %}

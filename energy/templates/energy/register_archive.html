@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block main %}
+    <h5>{% block title %}{{ title }}{% endblock %}</h5>
+    <hr>
+
+    {% for date in date_list %}
+        <a class="btn btn-lg btn-secondary col-4 col-sm-2 col-xl-1 m-3"
+           href="{% url 'energy:register_year' date|date:'Y' %}">
+            {{ date|date:'Y' }}
+        </a>
+    {% endfor %}
+{% endblock %}

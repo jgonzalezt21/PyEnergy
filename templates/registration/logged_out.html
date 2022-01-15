@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'user/css/logout.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="body text-center">
+        <div class="div-logout">
+            <h3>Sesión terminada</h3>
+
+            <h5 class="mt-3">Gracias por pasar un buen rato con el sitio web hoy.</h5>
+
+            <a class="btn btn-secondary mt-4" href="{% url 'login' %}">Iniciar sesión de nuevo</a>
+        </div>
+    </div>
+{% endblock %}

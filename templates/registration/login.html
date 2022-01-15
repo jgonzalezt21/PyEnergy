@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'user/css/signin.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="body-signin text-center">
+        <div class="form-signin">
+
+            <form action="{% url 'login' %}" method="post" id="login-form">{% csrf_token %}
+                <img class="img-logo" src="{% static 'energy/img/logo.png' %}" alt="logo">
+                <h1 class="h3 mb-3 fw-normal">Por favor, registrese</h1>
+
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <p class="error-note">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <p class="error-note">
+                        Ya se ha autenticado como {{ user.username|capfirst }}
+                    </p>
+                {% endif %}
+
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="id_username" placeholder="username" name="username"
+                           autocapitalize="none" autocomplete="username" maxlength="150" required>
+                    <label for="id_username">Nombre de usuario:</label>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="id_password" placeholder="Password" name="password"
+                           autocomplete="current-password" required>
+                    <label for="id_password">Contraseña:</label>
+                </div>
+
+                {% url 'admin_password_reset' as password_reset_url %}
+                {% if password_reset_url %}
+                    <div class="password-reset-link">
+                        <a href="{{ password_reset_url }}">¿Olvidó su contraseña o nombre de usuario?</a>
+                    </div>
+                {% endif %}
+
+                <button class="w-100 btn btn-lg btn-secondary" type="submit">Iniciar sesión</button>
+                <p class="mt-5 mb-3 text-muted">&copy; 2022</p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

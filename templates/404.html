@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}ERROR 404{% endblock %}
+
+{% block content %}
+    <div class="container text-center pt-5">
+        <h4>Datos no encontrados</h4>
+
+        <p>Lo sentimos, pero no se pudo encontrar la datos solicitados o no existen. </p>
+
+        <a class="btn btn-secondary" href="{% url 'energy:index' %}">
+            <i class="bi bi-arrow-left"></i> Inicio
+        </a>
+    </div>
+{% endblock %}
