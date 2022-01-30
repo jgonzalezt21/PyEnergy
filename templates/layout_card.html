@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% include 'navbar.html' %}
+
+    {% include 'alerts.html' %}
+
+    <div class="container-lg pt-3">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    {% block main %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

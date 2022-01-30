@@ -1,77 +1,82 @@
-{% extends "layout.html" %}
+{% extends "layout_card.html" %}
 
 {% block main %}
-    <h5>{% block title %}{{ title }}{% endblock %} {{ day }}</h5>
-    <hr>
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %} {{ day }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for r in object_list %}
+                <div class="col-10 col-sm-8 col-md-5 col-lg-3 mb-3">
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center"
+                            aria-current="true">
+                            {{ r.local }}
+                            <a class="btn btn-sm btn-success" href="{% url 'energy:edit' r.pk %}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </li>
 
-    {% for r in object_list %}
-        <div class="col-10 col-sm-8 col-md-5 col-lg-3 mb-3">
-            <ul class="list-group">
-                <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center"
-                    aria-current="true">
-                    {{ r.local }}
-                    <a class="btn btn-sm btn-success" href="{% url 'energy:edit' r.pk %}">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                </li>
-
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Plan
-                    <span class="badge bg-secondary rounded-pill">{{ r.plan }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Real
-                    <span class="badge bg-{% if r.real > 0 %}secondary{% else %}warning{% endif %} rounded-pill">{{ r.real }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {% if r.diff >= 0 %}
-                        Ahorro
-                    {% else %}
-                        Exceso
-                    {% endif %}
-                    <span class="badge bg-{% if r.diff >= 0 %}secondary{% else %}danger{% endif %} rounded-pill">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Plan
+                            <span class="badge bg-secondary rounded-pill">{{ r.plan }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Real
+                            <span class="badge bg-{% if r.real > 0 %}secondary{% else %}warning{% endif %} rounded-pill">{{ r.real }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {% if r.diff >= 0 %}
+                                Ahorro
+                            {% else %}
+                                Exceso
+                            {% endif %}
+                            <span class="badge bg-{% if r.diff >= 0 %}secondary{% else %}danger{% endif %} rounded-pill">
                         {{ r.diff }}
                     </span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Lectura
-                    <span class="badge bg-{% if r.reading > 0 %}secondary{% else %}warning{% endif %} rounded-pill">{{ r.reading }}</span>
-                </li>
-            </ul>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Lectura
+                            <span class="badge bg-{% if r.reading > 0 %}secondary{% else %}warning{% endif %} rounded-pill">{{ r.reading }}</span>
+                        </li>
+                    </ul>
+                </div>
+            {% endfor %}
+
+            <nav class="mt-5" aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    {% if previous_day %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="{% url 'energy:register_day' previous_day|date:'Y' previous_day|date:'m' previous_day|date:'d' %}"
+                               aria-label="Previous"><i class="bi bi-chevron-double-left"></i> {{ previous_day }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link"><i class="bi bi-chevron-double-left"></i></a>
+                        </li>
+                    {% endif %}
+
+                    {% if previous_day and next_day %}
+                        <li class="page-item disabled"><a class="page-link" href="#">--</a></li>
+                    {% endif %}
+
+                    {% if next_day %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="{% url 'energy:register_day' next_day|date:'Y' next_day|date:'m' next_day|date:'d' %}"
+                               aria-label="Next">{{ next_day }} <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link"><i class="bi bi-chevron-double-right"></i></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
-    {% endfor %}
-
-    <nav class="mt-5" aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-            {% if previous_day %}
-                <li class="page-item">
-                    <a class="page-link"
-                       href="{% url 'energy:register_day' previous_day|date:'Y' previous_day|date:'m' previous_day|date:'d' %}"
-                       aria-label="Previous"><i class="bi bi-chevron-double-left"></i> {{ previous_day }}
-                    </a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link"><i class="bi bi-chevron-double-left"></i></a>
-                </li>
-            {% endif %}
-
-            {% if previous_day and next_day %}
-                <li class="page-item disabled"><a class="page-link" href="#">--</a></li>
-            {% endif %}
-
-            {% if next_day %}
-                <li class="page-item">
-                    <a class="page-link"
-                       href="{% url 'energy:register_day' next_day|date:'Y' next_day|date:'m' next_day|date:'d' %}"
-                       aria-label="Next">{{ next_day }} <i class="bi bi-chevron-double-right"></i>
-                    </a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link"><i class="bi bi-chevron-double-right"></i></a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
+    </div>
+    {#    <div class="card-footer"></div>#}
 {% endblock %}

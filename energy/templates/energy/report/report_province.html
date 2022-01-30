@@ -1,0 +1,65 @@
+{% extends "layout_card.html" %}
+{#{% load static %}#}
+
+{#{% block css %}#}
+{#    <link rel="stylesheet" type="text/css"#}
+{#          href="{% static 'vendor/datatables/DataTables/css/dataTables.bootstrap5.min.css' %}">#}
+{#{% endblock %}#}
+
+{% block main %}
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %} {{ year|escape }}</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-hover" id="table">
+            <thead>
+            <tr>
+                <th>Mes</th>
+                <th>Plan</th>
+                <th>Real</th>
+                <th>Diferencia</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for object in object_data %}
+                <tr>
+                    <td>{{ object.month }}</td>
+                    <td>{{ object.plan_total }}</td>
+                    <td>{{ object.real_total }}</td>
+                    <td>{{ object.diff }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>Totales</th>
+                <th>{{ plan }}</th>
+                <th>{{ real }}</th>
+                <th>{{ diff }}</th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    {#            <div class="card-footer text-muted">#}
+    {#                2 days ago#}
+    {#            </div>#}
+{% endblock %}
+
+{#{% block js %}#}
+    {#    <script src="{% static 'vendor/jquery.min.js' %}"></script>#}
+    {#    <script src="{% static 'vendor/datatables/DataTables/js/jquery.dataTables.min.js' %}"></script>#}
+    {#    <script src="{% static 'vendor/datatables/DataTables/js/dataTables.bootstrap5.min.js' %}"></script>#}
+    {#    <script>#}
+    {#        $(document).ready(function () {#}
+    {#            $('#table').DataTable({#}
+    {#lengthMenu: [[-1], ['Todo']],#}
+    {#                dom: '<"top"f>rt<"clear">',#}
+    {#                buttons: ['copy', 'excel'],#}
+    {#                order: [],#}
+    {#                language: {#}
+    {#                    url: "{% static 'vendor/datatables/es.json' %}"#}
+    {#                }#}
+    {#            });#}
+    {#        });#}
+    {#    </script>#}
+{#{% endblock %}#}

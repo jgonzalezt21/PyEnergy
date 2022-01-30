@@ -1,13 +1,18 @@
-{% extends "layout.html" %}
+{% extends "layout_card.html" %}
 
 {% block main %}
-    <h5>{% block title %}{{ title }}{% endblock %}</h5>
-    <hr>
-
-    {% for date in date_list %}
-        <a class="btn btn-lg btn-secondary col-4 col-sm-2 col-xl-1 m-3"
-           href="{% url 'energy:register_year' date|date:'Y' %}">
-            {{ date|date:'Y' }}
-        </a>
-    {% endfor %}
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for date in date_list %}
+                <a class="btn btn-lg btn-secondary m-3" style="width: 5em"
+                   href="{% url 'energy:register_year' date|date:'Y' %}">
+                    {{ date|date:'Y' }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {#    <div class="card-footer"></div>#}
 {% endblock %}

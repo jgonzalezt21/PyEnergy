@@ -1,0 +1,46 @@
+{% extends "layout_card.html" %}
+
+{% block main %}
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %} {{ year|escape }}</h5>
+    </div>
+    <div class="card-body">
+        {% for d in data %}
+            {% for object in d.object_data %}
+                <h4>{{ d.local }}</h4>
+                <table class="table table-striped table-hover mb-4" id="table">
+                    <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th>Plan</th>
+                        <th>Real</th>
+                        <th>Diferencia</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{ object.month }}</td>
+                        <td>{{ object.plan_total }}</td>
+                        <td>{{ object.real_total }}</td>
+                        <td>{{ object.diff }}</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>Totales</th>
+                        <th>{{ d.plan }}</th>
+                        <th>{{ d.real }}</th>
+                        <th>{{ d.diff }}</th>
+                    </tr>
+                    </tfoot>
+                </table>
+
+
+            {% endfor %}
+        {% endfor %}
+
+    </div>
+    {#            <div class="card-footer text-muted">#}
+    {#                2 days ago#}
+    {#            </div>#}
+{% endblock %}

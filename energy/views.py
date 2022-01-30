@@ -1,15 +1,15 @@
 import json
 import calendar
 from datetime import date, timedelta, datetime
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.db.models.functions import ExtractMonth
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, UpdateView, FormView
+from django.views.generic import TemplateView, UpdateView, FormView, ListView
 from django.views.generic.dates import ArchiveIndexView, YearArchiveView, MonthArchiveView, DayArchiveView
 from .forms import RegisterUpdateForm, PlanningCreateForm
 from .models import Local, Register
@@ -97,7 +97,8 @@ class RegisterDayArchiveView(LoginRequiredMixin, DayArchiveView):
         return Register.objects.filter(local__in=locals_user(my_user(self)))
 
 
-class RegisterFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class RegisterFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, FormView):
+    permission_required = 'energy.add_register'
     form_class = PlanningCreateForm
     success_url = reverse_lazy('energy:add')
     success_message = 'Planificasión del mes creada.'
@@ -167,3 +168,85 @@ def province_user(user):
 
 def all_locals_prov_user(user):
     return Local.objects.filter(province=province_user(user))
+
+
+# --- Reports ------------------------------------------------------------------------------------------------------
+class ReportProvinceTemplateView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = 'energy.add_register'
+    template_name = 'energy/report/report_province.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        year = self.kwargs.get('year')
+        province = province_user(my_user(self))
+
+        qs = Register.objects.filter(reading_day__year=year, local__province=province). \
+            annotate(month=ExtractMonth('reading_day')).values('month'). \
+            annotate(plan_total=Sum('plan'), real_total=Sum('real'), diff=F('plan_total') - F('real_total')). \
+            values('month', 'plan_total', 'real_total', 'diff'). \
+            order_by('month')
+
+        plan = 0
+        real = 0
+        for q in qs:
+            plan += q['plan_total']
+            real += q['real_total']
+
+        context['year'] = year
+        context['object_data'] = qs
+        context['plan'] = plan
+        context['real'] = real
+        context['diff'] = plan - real
+        context['title'] = 'Acumulado Provincial'
+        return context
+
+
+class ReportLocalsTemplateView(LoginRequiredMixin, TemplateView):
+    template_name = 'energy/report/report_local.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        year = self.kwargs.get('year')
+        local = locals_user(my_user(self))
+
+        data = []
+        for loc in local:
+            plan = 0
+            real = 0
+            qs = Register.objects.filter(reading_day__year=year, local=loc). \
+                annotate(month=ExtractMonth('reading_day')).values('month'). \
+                annotate(plan_total=Sum('plan'), real_total=Sum('real'), diff=F('plan_total') - F('real_total')). \
+                values('month', 'plan_total', 'real_total', 'diff'). \
+                order_by('month')
+
+            for q in qs:
+                plan += q['plan_total']
+                real += q['real_total']
+            data.append({'local': loc, 'object_data': qs, 'plan': plan, 'real': real, 'diff': plan - real})
+
+        context['year'] = year
+        context['data'] = data
+        context['title'] = 'Acumulado'
+        return context
+
+
+class ReportRegisterDayListView(LoginRequiredMixin, ListView):
+    model = Register
+    template_name = 'energy/report/report_day.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+
+        qs = Register.objects.filter(reading_day__year=year, reading_day__month=month)
+        if my_user(self).is_staff:
+            qs = qs.filter(local__province=province_user(my_user(self)))
+        else:
+            qs = qs.filter(local__in=locals_user(my_user(self)))
+
+        context['object_list'] = qs
+        context['year'] = year
+        context['month'] = month
+        context['title'] = 'Registros'
+        return context

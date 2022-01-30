@@ -1,12 +1,27 @@
-{% extends "layout.html" %}
+{% extends "layout_card.html" %}
 
 {% block main %}
-    <h5>{% block title %}{{ title }}{% endblock %} de {{ year|date:'Y' }}</h5>
-    <hr>
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %} de {{ year|date:'Y' }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for d in date_list %}
+                <a class="btn btn-lg btn-secondary m-3" style="width: 7em"
+                   href="{% url 'energy:register_month' d|date:'Y' d|date:'m' %}">{{ d|date:'F' }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="card-footer">
+        {% if user.is_staff %}
+            <a class="btn btn-link" href="{% url 'energy:register_report_province' year|date:'Y' %}">
+                Acumulado Provincial * Mes
+            </a>
+        {% endif %}
 
-    {% for d in date_list %}
-        <a class="btn btn-lg btn-secondary col-4 col-sm-2 col-xl-1 m-3"
-           href="{% url 'energy:register_month' d|date:'Y' d|date:'m' %}">{{ d|date:'F' }}
+        <a class="btn btn-link" href="{% url 'energy:register_report_local' year|date:'Y' %}">
+            Acumulado * Mes
         </a>
-    {% endfor %}
+    </div>
 {% endblock %}

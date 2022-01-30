@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout_card.html" %}
 {% load static %}
 
 {% block css %}
@@ -6,60 +6,80 @@
 {% endblock %}
 
 {% block main %}
-    <h5>{% block title %}{{ title }}{% endblock %}</h5>
-    <hr>
-
-    {% if form.subject.errors %}
-        {% for error in form.subject.errors %}
-            <div class="alert alert-danger fade show" role="alert">
-                {{ error|escape }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="card w-75">
-        <div class="card-body">
-            <form method="post">{% csrf_token %}
-                {{ form.as_p }}
-
-                <p id="id_total">Total para el mes: 0</p>
-
-                <a href="{% url 'energy:index' %}" class="btn btn-success">
-                    <i class="bi bi-chevron-left"></i> Cancelar
-                </a>
-
-                <button type="submit" class="btn btn-secondary float-end">
-                    <i class="bi bi-save"></i> Guardar
-                </button>
-            </form>
-
-        </div>
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %} {{ form.instance }}</h5>
     </div>
+    <div class="card-body">
+        {% if form.subject.errors %}
+            {% for error in form.subject.errors %}
+                <div class="alert alert-danger fade show" role="alert">
+                    {{ error|escape }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">{% csrf_token %}
+            {{ form.as_p }}
+
+            {% if not form.instance %}
+                <p id="id_total">Total para el mes: 0</p>
+            {% endif %}
+
+            <a href="{% url 'energy:index' %}" class="btn btn-success">
+                <i class="bi bi-chevron-left"></i> Cancelar
+            </a>
+
+            <button type="submit" class="btn btn-secondary float-end">
+                <i class="bi bi-save"></i> Guardar
+            </button>
+        </form>
+    </div>
+    {#    <div class="card-footer"></div>#}
 {% endblock %}
 
 {% block js %}
     <script type="text/javascript">
-        let plan_lv = document.getElementById('id_plan_lv');
-        let plan_sd = document.getElementById('id_plan_sd');
-        let total = document.getElementById('id_total');
-        plan_lv.addEventListener('change', () => {
-            sum();
-        });
-        plan_lv.addEventListener('keyup', () => {
-            sum();
-        });
-        plan_sd.addEventListener('change', () => {
-            sum();
-        });
-        plan_sd.addEventListener('keyup', () => {
-            sum();
-        });
+        if (!'{{ form.instance }}') {
+            let lv = 0;
+            let sd = 0;
+            let reading_day = document.getElementById('id_reading_day');
+            reading_day.addEventListener('change', () => {
+                const form_date = document.getElementById('id_reading_day').value;
+                const year = form_date.substring(0, 4);
+                const month = form_date.substring(5, 7);
+                const days = new Date(year, month, 0).getDate();
+                {# WEEKDAY 0-Domingo, 1-Lunes, ......, 6-Sabado #}
+                for (let day = 1; day <= days; day++) {
+                    let weekday = new Date(year, month - 1, day).getDay();
+                    if (weekday === 0 || weekday === 6) {
+                        sd += 1;
+                    }
+                }
+                lv = days - sd;
+            });
 
-        function sum() {
-            let lv_size = plan_lv.value.length;
-            let sd_size = plan_sd.value.length;
-            if (lv_size > 0 && sd_size > 0) {
-                total.innerHTML = 'Total para el mes: ' + (parseInt(plan_lv.value) + parseInt(plan_sd.value));
+            let plan_lv = document.getElementById('id_plan_lv');
+            let plan_sd = document.getElementById('id_plan_sd');
+            let total = document.getElementById('id_total');
+            plan_lv.addEventListener('change', () => {
+                sum();
+            });
+            plan_lv.addEventListener('keyup', () => {
+                sum();
+            });
+            plan_sd.addEventListener('change', () => {
+                sum();
+            });
+            plan_sd.addEventListener('keyup', () => {
+                sum();
+            });
+
+            function sum() {
+                let lv_size = plan_lv.value.length;
+                let sd_size = plan_sd.value.length;
+                if (lv_size > 0 && sd_size > 0) {
+                    total.innerHTML = 'Total para el mes: ' + (parseInt(plan_lv.value) * lv + parseInt(plan_sd.value) * sd);
+                }
             }
         }
     </script>

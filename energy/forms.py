@@ -1,23 +1,23 @@
 from django import forms
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.forms import ModelForm, NumberInput, DateInput, Select, ModelChoiceField
 
 from .models import Register
 
 
 class PlanningCreateForm(forms.Form):
-    local = NumberInput()
+    local = forms.NumberInput()
     reading_day = forms.DateField(help_text='Seleccione día (1) del mes', label='Fecha',
-                                  widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+                                  widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
     plan_lv = forms.IntegerField(required=True, min_value=0, label='Plan de lunes a viernes',
-                                 widget=NumberInput(attrs={'class': 'form-control'}))
+                                 widget=forms.NumberInput(attrs={'class': 'form-control'}))
     plan_sd = forms.IntegerField(required=True, min_value=0, label='Plan de sabado y domingo',
-                                 widget=NumberInput(attrs={'class': 'form-control'}))
+                                 widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         local = kwargs.pop('local')
         super().__init__(*args, **kwargs)
-        self.fields['local'] = ModelChoiceField(queryset=local, widget=Select(attrs={'class': 'form-select'}))
+        self.fields['local'] = forms.ModelChoiceField(queryset=local,
+                                                      widget=forms.Select(attrs={'class': 'form-select'}))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -30,11 +30,11 @@ class PlanningCreateForm(forms.Form):
             pass
 
 
-class RegisterUpdateForm(ModelForm):
+class RegisterUpdateForm(forms.ModelForm):
     class Meta:
         model = Register
         fields = ['plan', 'reading']
         widgets = {
-            'plan': NumberInput(attrs={'class': 'form-control'}),
-            'reading': NumberInput(attrs={'class': 'form-control'}),
+            'plan': forms.NumberInput(attrs={'class': 'form-control'}),
+            'reading': forms.NumberInput(attrs={'class': 'form-control'}),
         }

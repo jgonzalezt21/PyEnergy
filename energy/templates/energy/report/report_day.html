@@ -1,0 +1,72 @@
+{% extends "layout_card.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'vendor/datatables/DataTables/css/dataTables.bootstrap5.min.css' %}">
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'vendor/datatables/Buttons/css/buttons.bootstrap5.min.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="card-header">
+        <h5 class="card-title">{% block title %}{{ title }}{% endblock %} {{ year|escape }}/{{ month|escape }}</h5>
+    </div>
+
+    <div class="card-body">
+        <table class="table table-striped table-hover" id="table">
+            <thead>
+            <tr>
+                <th>Local</th>
+                <th>Plan</th>
+                <th>Real</th>
+                <th>Diferencia</th>
+                <th>Lectura</th>
+                <th>Fecha</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for object in object_list %}
+                <tr>
+                    {% if perms.energy.add_register %}
+                        <td><a href="#">{{ object.local }}</a></td>
+                    {% else %}
+                        <td>{{ object.local }}</td>
+                    {% endif %}
+                    <td>{{ object.plan }}</td>
+                    <td>{{ object.real }}</td>
+                    <td>{{ object.diff }}</td>
+                    <td>{{ object.reading }}</td>
+                    <td>{{ object.reading_day }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'vendor/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/DataTables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/DataTables/js/dataTables.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/Buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/Buttons/js/buttons.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/JSZip/jszip.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'vendor/datatables/Buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/Buttons/js/buttons.print.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#table').DataTable({
+                dom: '<"row"<"col-md-4"l><"col-md-4"B><"col-md-4"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+                lengthMenu: [[7, 31, -1], ['Semana', 'Mes', 'Todo']],
+                buttons: ['excel', 'pdf', 'print'],
+                order: [],
+                language: {
+                    url: "{% static 'vendor/datatables/es.json' %}"
+                }
+            });
+        });
+    </script>
+{% endblock %}
