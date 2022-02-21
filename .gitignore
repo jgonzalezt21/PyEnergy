@@ -14,6 +14,9 @@ manage.py
 ### SECRET KEY ###
 secret_key.txt
 
+### SECRET KEY ###
+email_conf.txt
+
 ### IDEs ###
 .git/
 .idea/

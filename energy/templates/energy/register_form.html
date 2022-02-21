@@ -38,13 +38,16 @@
 {% endblock %}
 
 {% block js %}
+    <script src="{% static 'vendor/jquery.min.js' %}"></script>
     <script type="text/javascript">
         if (!'{{ form.instance }}') {
-            let lv = 0;
-            let sd = 0;
+            let lv;
+            let sd;
             let reading_day = document.getElementById('id_reading_day');
             reading_day.addEventListener('change', () => {
-                const form_date = document.getElementById('id_reading_day').value;
+                lv = 0;
+                sd = 0;
+                const form_date = reading_day.value;
                 const year = form_date.substring(0, 4);
                 const month = form_date.substring(5, 7);
                 const days = new Date(year, month, 0).getDate();
@@ -56,6 +59,21 @@
                     }
                 }
                 lv = days - sd;
+
+                {# Update select local#}
+                $.ajax({
+                    type: 'GET',
+                    url: "{% url 'energy:ajax_local' %}",
+                    data: {"reg_date": reading_day.value},
+                    success: function (response) {
+                        const json = JSON.parse(response);
+                        let temp = "";
+                        for (let jsonKey in json) {
+                            temp += "<option value='" + json[jsonKey].id + "'>" + json[jsonKey].name + "</option>";
+                        }
+                        $("#id_local").html(temp);
+                    }
+                });
             });
 
             let plan_lv = document.getElementById('id_plan_lv');

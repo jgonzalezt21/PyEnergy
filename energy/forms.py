@@ -5,19 +5,13 @@ from .models import Register
 
 
 class PlanningCreateForm(forms.Form):
-    local = forms.NumberInput()
     reading_day = forms.DateField(help_text='Seleccione día (1) del mes', label='Fecha',
                                   widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    local = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-select'}))
     plan_lv = forms.IntegerField(required=True, min_value=0, label='Plan de lunes a viernes',
                                  widget=forms.NumberInput(attrs={'class': 'form-control'}))
     plan_sd = forms.IntegerField(required=True, min_value=0, label='Plan de sabado y domingo',
                                  widget=forms.NumberInput(attrs={'class': 'form-control'}))
-
-    def __init__(self, *args, **kwargs):
-        local = kwargs.pop('local')
-        super().__init__(*args, **kwargs)
-        self.fields['local'] = forms.ModelChoiceField(queryset=local,
-                                                      widget=forms.Select(attrs={'class': 'form-select'}))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -35,6 +29,6 @@ class RegisterUpdateForm(forms.ModelForm):
         model = Register
         fields = ['plan', 'reading']
         widgets = {
-            'plan': forms.NumberInput(attrs={'class': 'form-control'}),
+            'plan': forms.NumberInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
             'reading': forms.NumberInput(attrs={'class': 'form-control'}),
         }

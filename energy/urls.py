@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import IndexView, RegisterFormView, RegisterYearArchiveView, RegisterArchiveIndexView, \
     RegisterMonthArchiveView, RegisterDayArchiveView, RegisterUpdateView, ReportProvinceTemplateView, \
-    ReportLocalsTemplateView, ReportRegisterDayListView
+    ReportLocalsTemplateView, ReportRegisterDayListView, ajax_local
 
 app_name = 'energy'
 urlpatterns = [
@@ -21,4 +21,7 @@ urlpatterns = [
          name='register_report_local'),
     path('register/reports/all/<int:year>/<int:month>/', ReportRegisterDayListView.as_view(),
          name='register_report_day'),
+
+    # Ajax
+    path('register/ajax/local/', ajax_local, name='ajax_local'),
 ]

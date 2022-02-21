@@ -9,6 +9,7 @@ from django.db.models import Sum, F
 from django.db.models.functions import ExtractMonth
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 from django.views.generic import TemplateView, UpdateView, FormView, ListView
 from django.views.generic.dates import ArchiveIndexView, YearArchiveView, MonthArchiveView, DayArchiveView
 from .forms import RegisterUpdateForm, PlanningCreateForm
@@ -105,11 +106,6 @@ class RegisterFormView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessa
     extra_context = {'title': 'Nuevo Registro'}
     template_name = 'energy/register_form.html'
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['local'] = all_locals_prov_user(my_user(self))
-        return kwargs
-
     def form_valid(self, form):
         reading_day = form.data['reading_day']
         local = Local.objects.get(pk=form.data['local'])
@@ -143,7 +139,7 @@ class RegisterUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             yesterday_reading = Register.objects.get(reading_day=yesterday, local=form.instance.local).reading
         except ObjectDoesNotExist:
             yesterday_reading = 0
-        form.instance.real = form.instance.reading - yesterday_reading
+        form.instance.real = abs(form.instance.reading - yesterday_reading)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -158,7 +154,9 @@ def my_user(self):
     return self.request.user
 
 
-def locals_user(user):
+def locals_user(user, all_locals=False):
+    if all_locals:
+        return Local.objects.filter(province=province_user(user))
     return Local.objects.filter(user=user)
 
 
@@ -207,7 +205,8 @@ class ReportLocalsTemplateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         year = self.kwargs.get('year')
-        local = locals_user(my_user(self))
+        user = my_user(self)
+        local = locals_user(user, user.is_staff)
 
         data = []
         for loc in local:
@@ -250,3 +249,13 @@ class ReportRegisterDayListView(LoginRequiredMixin, ListView):
         context['month'] = month
         context['title'] = 'Registros'
         return context
+
+
+# --- AJAX ------------------------------------------------------------------------------------------------------
+def ajax_local(request):
+    if request.method == 'GET':
+        print('----------- AJAX')
+        reg_date = request.GET['reg_date']
+        qs = Local.objects.filter(province=province_user(request.user)).values('id', 'name').exclude(
+            register__reading_day=reg_date)
+        return JsonResponse(json.dumps(list(qs), cls=DjangoJSONEncoder), safe=False)

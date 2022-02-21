@@ -4,7 +4,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block main %}
-    <div class="mt-3">
+    <div class="mt-3 mb-5">
         <figure class="highcharts-figure">
             <div id="container"></div>
             <p class="highcharts-description">
@@ -14,7 +14,7 @@
     </div>
 
     {% if user.is_staff %}
-        <div class="mt-5">
+        <div class="mb-5">
             <figure>
                 <div id="container2"></div>
                 <p>Un gráfico de líneas, compara los valores de plan y real durante el año.</p>
