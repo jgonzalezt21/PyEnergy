@@ -29,6 +29,6 @@ class RegisterUpdateForm(forms.ModelForm):
         model = Register
         fields = ['plan', 'reading']
         widgets = {
-            'plan': forms.NumberInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+            'plan': forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'reading': forms.NumberInput(attrs={'class': 'form-control'}),
         }
