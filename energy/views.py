@@ -254,7 +254,6 @@ class ReportRegisterDayListView(LoginRequiredMixin, ListView):
 # --- AJAX ------------------------------------------------------------------------------------------------------
 def ajax_local(request):
     if request.method == 'GET':
-        print('----------- AJAX')
         reg_date = request.GET['reg_date']
         qs = Local.objects.filter(province=province_user(request.user)).values('id', 'name').exclude(
             register__reading_day=reg_date)
