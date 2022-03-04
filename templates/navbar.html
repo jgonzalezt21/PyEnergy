@@ -37,7 +37,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userNavbarScrollingDropdown">
                         {% if user.is_staff %}
-                            <li><a class="dropdown-item" href="/admin/">Admin</a></li>
+                            <li><a class="dropdown-item" href="/admin/">Administración</a></li>
                         {% endif %}
                         <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
                     </ul>

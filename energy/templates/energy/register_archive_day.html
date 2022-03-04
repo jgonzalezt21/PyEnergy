@@ -12,9 +12,12 @@
                         <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center"
                             aria-current="true">
                             {{ r.local }}
-                            <a class="btn btn-sm btn-success" href="{% url 'energy:edit' r.pk %}">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+
+                            {% if r.is_edit %}
+                                <a class="btn btn-sm btn-success" href="{% url 'energy:edit' r.pk %}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            {% endif %}
                         </li>
 
                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -78,5 +81,4 @@
             </nav>
         </div>
     </div>
-    {#    <div class="card-footer"></div>#}
 {% endblock %}

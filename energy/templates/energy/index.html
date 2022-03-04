@@ -13,14 +13,14 @@
         </figure>
     </div>
 
-    {% if user.is_staff %}
-        <div class="mb-5">
-            <figure>
-                <div id="container2"></div>
-                <p>Un gráfico de líneas, compara los valores de plan y real durante el año.</p>
-            </figure>
-        </div>
-    {% endif %}
+    {#    {% if user.is_staff %}#}
+    <div class="mb-5">
+        <figure>
+            <div id="container2"></div>
+            <p>Un gráfico de líneas, compara los valores de plan y real durante el año.</p>
+        </figure>
+    </div>
+    {#    {% endif %}#}
 {% endblock %}
 
 {% block js %}
@@ -40,7 +40,7 @@
             }
             let series = [{'name': 'Plan', 'data': plan}, {'name': 'Real', 'data': real}];
 
-            title = 'Gráfica de consumo {{ local|join:' y ' }}';
+            title = 'Gráfica de consumo mensual';
             Highcharts.chart('container', {
                 chart: {
                     type: 'column'
@@ -74,55 +74,53 @@
         }
     </script>
 
-    {% if user.is_staff %}
-        <script type="text/javascript">
-            const json2 = JSON.parse('{{ data_prov|escapejs }}');
-            if (json2.length !== 0) {
-                let categories2 = [];
-                let plan2 = [];
-                let real2 = [];
-                const meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre',
-                    'Octubre', 'Noviembre', 'Diciembre'];
-                for (let jsonKey in json2) {
-                    categories2.push(meses[json2[jsonKey].month]);
+    <script type="text/javascript">
+        const json2 = JSON.parse('{{ data_prov|escapejs }}');
+        if (json2.length !== 0) {
+            let categories2 = [];
+            let plan2 = [];
+            let real2 = [];
+            const meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre',
+                'Octubre', 'Noviembre', 'Diciembre'];
+            for (let jsonKey in json2) {
+                categories2.push(meses[json2[jsonKey].month]);
 
-                    plan2.push(parseInt(json2[jsonKey].plan2));
-                    real2.push(parseInt(json2[jsonKey].real2));
-                }
-                let series2 = [{'name': 'Plan', 'data': plan2}, {'name': 'Real', 'data': real2}];
-
-                title = 'Gráfica de consumo provinca {{ province }}';
-                Highcharts.chart('container2', {
-                    chart: {
-                        type: 'line'
-                    },
-                    title: {
-                        text: title
-                    },
-                    subtitle: {
-                        text: '{{ year }}'
-                    },
-                    xAxis: {
-                        categories: categories2,
-                        crosshair: true
-                    },
-                    yAxis: {
-                        min: 0,
-                        title: {
-                            text: 'Consumo'
-                        }
-                    },
-                    plotOptions: {
-                        line: {
-                            dataLabels: {
-                                enabled: true
-                            },
-                            enableMouseTracking: false
-                        }
-                    },
-                    series: series2
-                });
+                plan2.push(parseInt(json2[jsonKey].plan2));
+                real2.push(parseInt(json2[jsonKey].real2));
             }
-        </script>
-    {% endif %}
+            let series2 = [{'name': 'Plan', 'data': plan2}, {'name': 'Real', 'data': real2}];
+
+            title = 'Gráfica de consumo anual {% if user.is_staff %}Provincial{% endif %}';
+            Highcharts.chart('container2', {
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: title
+                },
+                subtitle: {
+                    text: '{{ year }}'
+                },
+                xAxis: {
+                    categories: categories2,
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Consumo'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: false
+                    }
+                },
+                series: series2
+            });
+        }
+    </script>
 {% endblock %}

@@ -41,15 +41,19 @@ class IndexView(LoginRequiredMixin, TemplateView):
             values('reading_day').annotate(plan=Sum('plan'), real=Sum('real')).order_by('reading_day')
         context['data_local'] = json.dumps(list(qs), cls=DjangoJSONEncoder)
 
+        year = int(today.strftime('%Y'))
+        province = province_user(user)
+        qs = Register.objects.filter(reading_day__year=year)
         if user.is_staff:
-            year = int(today.strftime('%Y'))
-            province = province_user(user)
-            qs = Register.objects.filter(reading_day__year=year, local__province=province). \
-                annotate(month=ExtractMonth('reading_day')).values('month'). \
-                annotate(plan2=Sum('plan'), real2=Sum('real')).values('month', 'plan2', 'real2')
-            context['data_prov'] = json.dumps(list(qs), cls=DjangoJSONEncoder)
-            context['province'] = province
-            context['year'] = year
+            qs = qs.filter(local__province=province)
+        else:
+            qs = qs.filter(local__in=local_user)
+
+        qs = qs.annotate(month=ExtractMonth('reading_day')).values('month'). \
+            annotate(plan2=Sum('plan'), real2=Sum('real')).values('month', 'plan2', 'real2')
+        context['data_prov'] = json.dumps(list(qs), cls=DjangoJSONEncoder)
+        context['province'] = province
+        context['year'] = year
 
         context['local'] = local_user
         context['month'] = today
@@ -132,6 +136,16 @@ class RegisterUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = RegisterUpdateForm
     success_message = 'Registro del día actualizado.'
     extra_context = {'title': 'Actualizar Registro'}
+
+    def get(self, *args, **kwargs):
+        register = Register.objects.get(pk=self.kwargs.get('pk'))
+        if not register.is_edit:
+            return redirect('/')
+
+        local = locals_user(my_user(self))
+        if register.local not in local:
+            return redirect('/')
+        return super(RegisterUpdateView, self).get(*args, **kwargs)
 
     def form_valid(self, form):
         yesterday = form.instance.reading_day - timedelta(days=1)

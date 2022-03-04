@@ -41,6 +41,7 @@ class Register(models.Model):
     real = models.PositiveIntegerField(default=0, verbose_name=_('Real'))
     reading = models.PositiveIntegerField(default=0, verbose_name=_('Lectura'))
     local = models.ForeignKey(Local, on_delete=models.CASCADE, verbose_name=_('Local'))
+    is_edit = models.BooleanField(default=True, verbose_name=_('Editable'))
 
     @property
     def diff(self) -> int:
